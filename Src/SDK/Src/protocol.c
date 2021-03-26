@@ -106,6 +106,7 @@ void uart_transmit_output(unsigned char value)
 {
     /* #error "请将MCU串口发送函数填入该函数,并删除该行" */
     
+    Bsp_Usart_Send_Data(BSP_SDK_USART, value);
 /*
     //Example:
     extern void Uart_PutChar(unsigned char value);
@@ -155,6 +156,12 @@ void all_data_update(void)
     mcu_dp_value_update(DPID_WEIGHT,当前余粮重量); //VALUE型数据上报;
 
     */
+    // if()
+    //     /* 充电状态 */
+    //     mcu_dp_bool_update(DPID_CHARGE_STATE, Charge); //BOOL型数据上报;
+    // else
+    //     /* 非充电状态 */
+    //      mcu_dp_bool_update(DPID_CHARGE_STATE, NoCharge); //BOOL型数据上报;
 }
 
 
@@ -200,15 +207,33 @@ static unsigned char dp_download_manual_feed_handle(const unsigned char value[],
     //示例:当前DP类型为VALUE
     unsigned char ret;
     unsigned long manual_feed;
+    unsigned long temp;
     
     manual_feed = mcu_get_dp_download_value(value,length);
+    temp = manual_feed;
+    ret = 0;
     /*
     //VALUE类型数据处理
-    
     */
+   while(temp != 0)
+   {   
+        Bsp_Feeder_Feed_Ctl();
+
+        if(!ret)
+        {
+            mcu_dp_enum_update(DPID_FEED_STATE, DP_FEEDER_FEEDING);
+            ret++;
+        }
+
+        temp--;
+   }
+    ret = 0;
     
     //处理完DP数据后应有反馈
     ret = mcu_dp_value_update(DPID_MANUAL_FEED,manual_feed);
+    mcu_dp_enum_update(DPID_FEED_STATE, DP_FEEDER_DONE);
+    delay_ms(3000);
+    mcu_dp_enum_update(DPID_FEED_STATE, DP_FEEDER_STANDBY);
     if(ret == SUCCESS)
         return SUCCESS;
     else
@@ -228,12 +253,22 @@ static unsigned char dp_download_export_calibrate_handle(const unsigned char val
     unsigned char ret;
     //0:关/1:开
     unsigned char export_calibrate;
+    unsigned long export_weight = 0;
     
     export_calibrate = mcu_get_dp_download_bool(value,length);
     if(export_calibrate == 0) {
         //开关关
     }else {
-        //开关开
+        while(1)
+        {
+            /* 获取出粮的重量 */
+            export_weight++;
+            if(export_weight >= STANDARD_WEIGHT)
+            {
+                break;
+            }
+            Bsp_Feeder_Feed_Ctl();
+        }
     }
   
     //处理完DP数据后应有反馈

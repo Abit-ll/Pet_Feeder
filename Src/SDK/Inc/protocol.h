@@ -297,7 +297,20 @@ BLE_test_result内部有#err提示,完成函数后请删除该#err
 //备注:
 #define DPID_WEIGHT 17
 
+/*
+ * 喂食状态定义
+ */
+#define DP_FEEDER_STANDBY   0x00
+#define DP_FEEDER_FEEDING   0x01
+#define DP_FEEDER_DONE      0x02
 
+#define STANDARD_WEIGHT     3
+
+enum Charge
+{
+  NoCharge = 0,
+  Charge,
+};
 
 /**
  * @brief  串口发送数据

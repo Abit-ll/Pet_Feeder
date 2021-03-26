@@ -23,6 +23,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x_it.h"
 
+uint16_t recv_buff[21] = {0x00, };
+
 /** @addtogroup Template_Project
   * @{
   */
@@ -154,6 +156,19 @@ void SysTick_Handler(void)
 /**
   * @}
   */ 
+void USART2_IRQHandler(void)
+{
+	uint16_t value;
+	static uint16_t i = 0;
+
+	if(USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)
+	{
+		value = USART_ReceiveData(USART2);
+
+		uart_receive_input(value);
+	}
+	
+}
 
 
 /******************* (C) COPYRIGHT 2009 STMicroelectronics *****END OF FILE****/

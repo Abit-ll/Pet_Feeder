@@ -2,8 +2,7 @@
 #define __MAIN_H
 
 #include "stm32f10x.h"
-#include "Bsp_Usart.h"
 #include "wifi.h"
-#include "protocol.h"
+#include "Bsp_Feeder_Ctl.h"
 
 #endif //__MAIN_H

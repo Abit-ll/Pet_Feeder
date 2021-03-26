@@ -236,6 +236,7 @@ static unsigned char data_point_handle(const unsigned char value[])
 
     if(dp_type != download_cmd[index].dp_type) {
         //错误提示
+        printf("Unknow dp type\r\n");
         return FALSE;
     }else {
         ret = dp_download_handle(dp_id,value + 4,dp_len);
